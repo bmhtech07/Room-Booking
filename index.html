@@ -138,6 +138,14 @@
       const rooms = ["room-1", "room-2"];
       const dateInput = document.getElementById("date");
 
+      const xfHolds = {
+        1: ["09:00"],
+        2: ["09:00"],
+        3: ["09:30", "10:00", "16:30", "17:00"],
+        4: ["09:30"],
+        5: ["09:30"]
+      };
+
       const today = new Date().toLocaleDateString("en-CA");
       dateInput.value = today;
       dateInput.min = today;
@@ -163,6 +171,9 @@
 
         const myCodes = loadMyCodes();
 
+        const weekday = new Date(dateInput.value + "T00:00").getDay();
+        const xfToday = xfHolds[weekday] || [];
+
         for (const room of rooms) {
           const container = document.getElementById("slots-" + room);
           container.replaceChildren();
@@ -177,7 +188,11 @@
 
               const booking = bookings.find(b => b.room === room && b.time === time);
 
-              if (booking && myCodes[key]) {
+              if (room === "room-1" && xfToday.includes(time)) {
+                button.textContent = time + " XF";
+                button.classList.add("held");
+                button.disabled = true;
+              } else if (booking && myCodes[key]) {                
                 button.textContent = time + " " + booking.name + " (yours)";
                 button.classList.add("held", "mine");
 
